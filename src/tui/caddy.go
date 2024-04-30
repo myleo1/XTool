@@ -168,7 +168,7 @@ func (ui *UI) caddyBinaryDownload(next string, update bool) *tview.Grid {
 			SetQueryString(u.Encode()).
 			SetOutputFile("/usr/bin/caddy").
 			SetDownloadCallback(callback).
-			Get("https://caddyserver.com/api/download")
+			Get("https://caddyserver.com/api/download?os=linux&arch=amd64&id=github.com/caddyserver/caddy/v2@v2.6.4")
 
 		if err != nil {
 			panic(err)
