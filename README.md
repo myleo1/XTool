@@ -23,7 +23,7 @@
 - x86_64 (amd64)
 
 ```shell
-wget https://github.com/LordPenguin666/XTool/releases/download/latest/xtool
+wget https://github.com/myleo1/XTool/releases/download/latest/xtool
 chmod +x xtool
 ./xtool
 ```
@@ -31,7 +31,7 @@ chmod +x xtool
 - aarch64 (arm64)
 
 ```shell
-wget https://github.com/LordPenguin666/XTool/releases/download/latest/xtool-arm
+wget https://github.com/myleo1/XTool/releases/download/latest/xtool-arm
 chmod +x xtool-arm
 ./xtool-arm
 ```

@@ -115,7 +115,7 @@ func (ui *UI) caddyBinaryDownload(next string, update bool) *tview.Grid {
 
 		u.Add("os", "linux")
 		//u.Add("p", "github.com/mholt/caddy-l4")
-		u.Add("p", "github.com/mastercactapus/caddy2-proxyprotocol")
+		//u.Add("p", "github.com/mastercactapus/caddy2-proxyprotocol")
 		//u.Add("p", "github.com/caddyserver/jsonc-adapter")
 
 		switch ui.arch {
@@ -168,7 +168,7 @@ func (ui *UI) caddyBinaryDownload(next string, update bool) *tview.Grid {
 			SetQueryString(u.Encode()).
 			SetOutputFile("/usr/bin/caddy").
 			SetDownloadCallback(callback).
-			Get("https://caddyserver.com/api/download?os=linux&arch=amd64&id=github.com/caddyserver/caddy/v2@v2.6.4")
+			Get("https://caddyserver.com/api/download")
 
 		if err != nil {
 			panic(err)
