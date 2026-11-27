@@ -95,65 +95,35 @@ func (ui *UI) caddyBinaryDownload(next string, update bool) *tview.Grid {
 	go func() {
 		//time.Sleep(time.Second)
 
-		ifFileExist := func() {
-			// 如果 caddy 存在, 则删除
-			if ui.fileExist("/usr/bin/caddy") {
-				if _, err := command.CaddySystemd("stop").CombinedOutput(); err != nil {
-					panic(err)
-				}
+		// 仅在尚未安装 caddy systemd 服务时通过包管理器安装，避免重复执行
+		caddyServiceInstalled := ui.fileExist("/lib/systemd/system/caddy.service") || ui.fileExist("/usr/lib/systemd/system/caddy.service")
+		if !caddyServiceInstalled {
+			var cmds []*exec.Cmd
 
-				if err := os.Remove("/usr/bin/caddy"); err != nil {
-					panic(err)
-				}
+			switch ui.platform {
+			case "rhel":
+				cmds = command.CaddyRedHatInstall()
+			case "debian":
+				cmds = command.CaddyDebianInstall()
+			//case "arch":
+			//	cmds = command.CaddyArchInstall()
+			default:
+				panic("not a supported system: " + ui.platform)
+			}
 
+			for _, cmd := range cmds {
+				output, _ := cmd.CombinedOutput()
 				ui.app.QueueUpdateDraw(func() {
-					ui.updateFooter()
+					text += "\n" + string(output)
 				})
 			}
-		}
-		u := url.Values{}
 
-		u.Add("os", "linux")
-		//u.Add("p", "github.com/mholt/caddy-l4")
-		//u.Add("p", "github.com/mastercactapus/caddy2-proxyprotocol")
-		//u.Add("p", "github.com/caddyserver/jsonc-adapter")
-
-		switch ui.arch {
-		case "x86_64":
-			u.Add("arch", "amd64")
-		case "aarch64":
-			u.Add("arch", "arm64")
-		default:
-			u.Add("arch", ui.arch)
-		}
-
-		ifFileExist()
-
-		// 从官方下载 Caddy 配置
-		var cmds []*exec.Cmd
-
-		switch ui.platform {
-		case "rhel":
-			cmds = command.CaddyRedHatInstall()
-		case "debian":
-			cmds = command.CaddyDebianInstall()
-		//case "arch":
-		//	cmds = command.CaddyArchInstall()
-		default:
-			panic("not a supported system: " + ui.platform)
-		}
-
-		for _, cmd := range cmds {
-			output, _ := cmd.CombinedOutput()
 			ui.app.QueueUpdateDraw(func() {
-				text += "\n" + string(output)
+				ui.updateFooter()
 			})
 		}
 
-		ui.updateFooter()
-		ifFileExist()
-
-		// 替换为有插件的 Caddy
+		// 替换为有插件的 Caddy（先下载到临时文件，再停止服务并原子替换）
 		now := time.Now()
 		callback := func(info req.DownloadInfo) {
 			if info.Response.Response != nil {
@@ -164,17 +134,37 @@ func (ui *UI) caddyBinaryDownload(next string, update bool) *tview.Grid {
 			}
 		}
 
+		u := url.Values{}
+		u.Add("os", "linux")
+		switch ui.arch {
+		case "x86_64":
+			u.Add("arch", "amd64")
+		case "aarch64":
+			u.Add("arch", "arm64")
+		default:
+			u.Add("arch", ui.arch)
+		}
+
+		const caddyTmpPath = "/usr/bin/caddy.tmp"
 		_, err := ui.client.R().
 			SetQueryString(u.Encode()).
-			SetOutputFile("/usr/bin/caddy").
+			SetOutputFile(caddyTmpPath).
 			SetDownloadCallback(callback).
 			Get("https://caddyserver.com/api/download")
 
 		if err != nil {
+			_ = os.Remove(caddyTmpPath)
 			panic(err)
 		}
 
-		if err = os.Chmod("/usr/bin/caddy", 755); err != nil {
+		if err = os.Chmod(caddyTmpPath, 0755); err != nil {
+			_ = os.Remove(caddyTmpPath)
+			panic(err)
+		}
+
+		_, _ = command.CaddySystemd("stop").CombinedOutput()
+		if err = os.Rename(caddyTmpPath, "/usr/bin/caddy"); err != nil {
+			_ = os.Remove(caddyTmpPath)
 			panic(err)
 		}
 
@@ -191,18 +181,18 @@ func (ui *UI) caddyBinaryDownload(next string, update bool) *tview.Grid {
 		}
 
 		// 配置 Caddyfile
-		if err = os.WriteFile("/etc/caddy/Caddyfile", []byte(ui.getMainCaddyFile()), 644); err != nil {
+		if err = os.WriteFile("/etc/caddy/Caddyfile", []byte(ui.getMainCaddyFile()), 0644); err != nil {
 			panic(err)
 		}
 
 		// 配置 站点
 		switch ui.localDomain.Scheme {
 		case "http":
-			if err = os.WriteFile(fmt.Sprintf("/etc/caddy/conf.d/%v", ui.localDomain.Hostname()), []byte(ui.getCaddyfileProxyHTTP()), 644); err != nil {
+			if err = os.WriteFile(fmt.Sprintf("/etc/caddy/conf.d/%v", ui.localDomain.Hostname()), []byte(ui.getCaddyfileProxyHTTP()), 0644); err != nil {
 				panic(err)
 			}
 		case "https":
-			if err = os.WriteFile(fmt.Sprintf("/etc/caddy/conf.d/%v", ui.localDomain.Hostname()), []byte(ui.getCaddyfileProxyHTTPS()), 644); err != nil {
+			if err = os.WriteFile(fmt.Sprintf("/etc/caddy/conf.d/%v", ui.localDomain.Hostname()), []byte(ui.getCaddyfileProxyHTTPS()), 0644); err != nil {
 				panic(err)
 			}
 		default:

@@ -186,7 +186,7 @@ func (ui *UI) CaddyConfigWithLayer4() *UI {
 		panic(err)
 	}
 
-	if err = os.WriteFile("/etc/caddy/config.json", b, 644); err != nil {
+	if err = os.WriteFile("/etc/caddy/config.json", b, 0644); err != nil {
 		panic(err)
 	}
 
