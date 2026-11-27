@@ -10,19 +10,15 @@ func (ui *UI) menu() *tview.Grid {
 		ui.nextContent(ui.tlsForm())
 	})
 
-	list.AddItem("安装 Xray + Vless + tls-rprx-vision + reality", "免域名, 但是不够灵活 :(", '1', func() {
-
-	})
-
-	list.AddItem("Caddy 配置", "", '2', func() {
+	list.AddItem("Caddy 配置", "", '1', func() {
 		ui.nextContent(ui.caddyMenu())
 	})
 
-	list.AddItem("Xray 配置", "", '3', func() {
+	list.AddItem("Xray 配置", "", '2', func() {
 		ui.nextContent(ui.xrayMenu())
 	})
 
-	list.AddItem("Xray QR Code", "生成 Xray 二维码", '4', func() {
+	list.AddItem("Xray QR Code", "生成 Xray 二维码", '3', func() {
 		ui.nextContent(ui.xrayQrcode())
 	})
 
