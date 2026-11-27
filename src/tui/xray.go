@@ -109,6 +109,12 @@ func configureXrayServiceUser() error {
 		return err
 	}
 
+	if _, err := os.Stat("/usr/local/etc/xray"); err == nil {
+		if err := exec.Command("chown", "-R", "root:caddy", "/usr/local/etc/xray").Run(); err != nil {
+			return err
+		}
+	}
+
 	if _, err := os.Stat("/var/log/xray"); err == nil {
 		if err := exec.Command("chown", "-R", "caddy:caddy", "/var/log/xray").Run(); err != nil {
 			return err
