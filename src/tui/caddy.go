@@ -2,6 +2,7 @@ package tui
 
 import (
 	"fmt"
+	"github.com/imroc/req/v3"
 	"github.com/rivo/tview"
 	"net/url"
 	"os"
