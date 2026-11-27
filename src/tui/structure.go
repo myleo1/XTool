@@ -14,9 +14,9 @@ func (ui *UI) newLayout() *UI {
 func (ui *UI) newHeader() *UI {
 	ui.header = tview.NewGrid().SetRows(0, 0, 0, 0, 0).
 		AddItem(tview.NewTextView(), 0, 0, 1, 1, 0, 0, false).
-		AddItem(tview.NewTextView().SetTextAlign(tview.AlignCenter).SetText("Xray Tool v1.1").SetTextColor(tcell.ColorLightGreen), 1, 0, 1, 1, 0, 0, false).
-		AddItem(tview.NewTextView().SetTextAlign(tview.AlignCenter).SetText("https://github.com/LordPenguin666/XTool").SetTextColor(tcell.ColorLightBlue), 2, 0, 1, 1, 0, 0, false).
-		AddItem(tview.NewTextView().SetTextAlign(tview.AlignCenter).SetText("给面包狗点个 Star 喵, 给面包狗点个 Star 谢谢喵").SetTextColor(tcell.ColorOrangeRed), 3, 0, 1, 1, 0, 0, false).
+		AddItem(tview.NewTextView().SetTextAlign(tview.AlignCenter).SetText("Xray Tool v2.0").SetTextColor(tcell.ColorLightGreen), 1, 0, 1, 1, 0, 0, false).
+		AddItem(tview.NewTextView().SetTextAlign(tview.AlignCenter).SetText("https://github.com/myleo1/XTool").SetTextColor(tcell.ColorLightBlue), 2, 0, 1, 1, 0, 0, false).
+		AddItem(tview.NewTextView().SetTextAlign(tview.AlignCenter).SetText("Xray + Caddy 一键安装与管理工具").SetTextColor(tcell.ColorOrangeRed), 3, 0, 1, 1, 0, 0, false).
 		AddItem(tview.NewTextView(), 4, 0, 1, 1, 0, 0, false)
 
 	return ui

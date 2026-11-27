@@ -15,7 +15,7 @@
 ## Usage
 
 ### 已测试系统
-- Debian 11
+- Debian 11 / 13
 - Rocky Linux 9
 
 ### 下载运行
@@ -23,7 +23,7 @@
 - x86_64 (amd64)
 
 ```shell
-wget https://github.com/myleo1/XTool/releases/download/latest/xtool
+wget https://github.com/myleo1/XTool/releases/latest/download/xtool
 chmod +x xtool
 ./xtool
 ```
@@ -31,12 +31,12 @@ chmod +x xtool
 - aarch64 (arm64)
 
 ```shell
-wget https://github.com/myleo1/XTool/releases/download/latest/xtool-arm
+wget https://github.com/myleo1/XTool/releases/latest/download/xtool-arm
 chmod +x xtool-arm
 ./xtool-arm
 ```
 
 ## Preview
-![](https://github.com/LordPenguin666/XTool/blob/main/img/menu.png?raw=true)
-![](https://github.com/LordPenguin666/XTool/blob/main/img/basic.png?raw=true)
-![](https://github.com/LordPenguin666/XTool/blob/main/img/addr.png?raw=true)
+![](https://github.com/myleo1/XTool/blob/main/img/menu.png?raw=true)
+![](https://github.com/myleo1/XTool/blob/main/img/basic.png?raw=true)
+![](https://github.com/myleo1/XTool/blob/main/img/addr.png?raw=true)
