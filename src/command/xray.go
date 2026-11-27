@@ -11,7 +11,7 @@ func XraySystemd(command string) *exec.Cmd {
 }
 
 func XrayInstall() *exec.Cmd {
-	return exec.Command("bash", "-c", "./install-release.sh install -u caddy")
+	return exec.Command("bash", "-c", "./install-release.sh install")
 }
 
 func XrayUninstall() *exec.Cmd {

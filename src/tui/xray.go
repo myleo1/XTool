@@ -3,6 +3,7 @@ package tui
 import (
 	"github.com/rivo/tview"
 	"os"
+	"os/exec"
 	"xray-tool/src/command"
 )
 
@@ -94,6 +95,33 @@ func (ui *UI) xrayScriptRemove() *UI {
 	return ui
 }
 
+// configureXrayServiceUser ensures xray.service runs as the caddy user so it can read Caddy's TLS certificates.
+func configureXrayServiceUser() error {
+	const overrideDir = "/etc/systemd/system/xray.service.d"
+	const overrideFile = overrideDir + "/10-user-caddy.conf"
+	const overrideContent = "[Service]\nUser=caddy\nGroup=caddy\n"
+
+	if err := os.MkdirAll(overrideDir, 0755); err != nil {
+		return err
+	}
+
+	if err := os.WriteFile(overrideFile, []byte(overrideContent), 0644); err != nil {
+		return err
+	}
+
+	if _, err := os.Stat("/var/log/xray"); err == nil {
+		if err := exec.Command("chown", "-R", "caddy:caddy", "/var/log/xray").Run(); err != nil {
+			return err
+		}
+	}
+
+	if _, err := command.SystemdReload().CombinedOutput(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (ui *UI) xrayInstall(update bool) *tview.Grid {
 	text := "Start to install Xray...\n"
 	textView := tview.NewTextView().SetTextAlign(tview.AlignLeft).SetText(text)
@@ -111,6 +139,10 @@ func (ui *UI) xrayInstall(update bool) *tview.Grid {
 			panic(err)
 		}
 
+		if err = configureXrayServiceUser(); err != nil {
+			panic(err)
+		}
+
 		text += string(output)
 		ui.app.QueueUpdateDraw(func() {
 			textView.SetText(text)
@@ -123,6 +155,7 @@ func (ui *UI) xrayInstall(update bool) *tview.Grid {
 		})
 
 		if update {
+			_, _ = command.XraySystemd("restart").CombinedOutput()
 			ui.nextContent(ui.menu())
 			return
 		}
